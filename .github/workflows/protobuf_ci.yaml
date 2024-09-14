@@ -1,0 +1,42 @@
+name: Protobuf CI
+
+on:
+  push:
+    branches:
+      - main
+      - "v*"
+    paths:
+      - "protobuf/**"
+  pull_request:
+    paths:
+      - "protobuf/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: protobuf
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Gleam and Erlang/OTP
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: "26.0.2"
+          gleam-version: "1.4.1"
+          rebar3-version: "3.22.0"
+
+      - name: Install Dependencies
+        run: gleam deps download
+
+      - name: Build Project
+        run: gleam build
+
+      - name: Run Tests
+        run: gleam test
+
+      - name: Check Formatting
+        run: gleam format --check src test
