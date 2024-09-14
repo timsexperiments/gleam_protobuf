@@ -1,0 +1,48 @@
+name: Proto Gen Gleam CI
+
+on:
+  push:
+    paths:
+      - "proto_gen_gleam/**"
+      - "protobuf/**"
+  pull_request:
+    paths:
+      - "proto_gen_gleam/**"
+      - "protobuf/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: proto_gen_gleam
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Gleam and Erlang/OTP
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: "26.0.2"
+          gleam-version: "1.4.1"
+          rebar3-version: "3.22.0"
+
+      - name: Install Dependencies
+        run: gleam deps download
+
+      - name: Build Project
+        run: gleam build
+
+      - name: Run Tests
+        run: gleam test
+
+      - name: Check Formatting
+        run: gleam format --check src test
+
+      - name: Build Plugin Executable (Optional)
+        run: |
+          # Steps to build the proto-gen-gleam plugin executable
+          # This might involve compiling to an escript or similar
+          echo "Building proto-gen-gleam plugin executable..."
